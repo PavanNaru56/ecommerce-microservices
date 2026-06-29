@@ -34,17 +34,24 @@ public class JwtUtilities {
 
     public Claims getClaimsFromToken(String token){
 
-        Claims claims = Jwts.parser()
-                .verifyWith(Keys.hmacShaKeyFor(secretKey.getBytes()))
-                .build()
-                .parseClaimsJws(token)
-                .getPayload();
-        return claims;
+            Claims claims = Jwts.parser()
+                    .verifyWith(Keys.hmacShaKeyFor(secretKey.getBytes()))
+                    .build()
+                    .parseClaimsJws(token)
+                    .getPayload();
+            return claims;
+
+
     }
 
     public String getUsernameFromToken(String token){
-        Claims claims = getClaimsFromToken(token);
-        return claims.getSubject();
+        try {
+            Claims claims = getClaimsFromToken(token);
+            return claims.getSubject();
+        }catch (Exception e){
+            System.out.println("Invalid token" + e.getMessage());
+            return "";
+        }
     }
 
     public String extractRole(String token){

@@ -3,12 +3,15 @@ package com.api_gateway.api_gateway.security;
 import org.springframework.cloud.gateway.filter.GatewayFilterChain;
 import org.springframework.cloud.gateway.filter.GlobalFilter;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Mono;
 
 @Component
 public class JwtFilter implements GlobalFilter {
+
+    private UserDetails userDetails;
 
     private JwtUtilities jwtUtilities;
     public JwtFilter(JwtUtilities jwtUtilities) {
@@ -35,11 +38,16 @@ public class JwtFilter implements GlobalFilter {
 
         String token = header.substring(7);
 
-        try {
-            jwtUtilities.getUsernameFromToken(token);
-        }
-        catch (Exception e){
-            exchange.getResponse().setComplete();
+//        try {
+//            jwtUtilities.isTokenExpired(token);
+//        }
+//        catch (Exception e){
+//            exchange.getResponse().setComplete();
+//        }
+
+        if(jwtUtilities.getUsernameFromToken(token).isEmpty()){
+            exchange.getResponse().setStatusCode(HttpStatus.UNAUTHORIZED);
+            return exchange.getResponse().setComplete();
         }
 
         return chain.filter(exchange);
