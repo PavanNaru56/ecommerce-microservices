@@ -26,6 +26,8 @@ public class JwtUtility {
                 .get()
                 .getAuthority();
 
+        System.out.println("User Details in user-service : " + userDetails.getUsername());
+        System.out.println("Role : " + role);
 
         return Jwts.builder()
                 .setSubject(userDetails.getUsername())

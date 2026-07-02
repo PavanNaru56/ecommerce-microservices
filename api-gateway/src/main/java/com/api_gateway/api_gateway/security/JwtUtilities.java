@@ -23,6 +23,8 @@ public class JwtUtilities {
                 .get()
                 .getAuthority();
 
+        System.out.println("User Details in api-gateway : " + userDetails.getUsername());
+
         return Jwts.builder()
                 .setSubject(userDetails.getUsername())
                 .claim("role", role)
@@ -34,11 +36,16 @@ public class JwtUtilities {
 
     public Claims getClaimsFromToken(String token){
 
-            Claims claims = Jwts.parser()
-                    .verifyWith(Keys.hmacShaKeyFor(secretKey.getBytes()))
-                    .build()
-                    .parseClaimsJws(token)
-                    .getPayload();
+//            Claims claims = Jwts.parser()
+//                    .verifyWith(Keys.hmacShaKeyFor(secretKey.getBytes()))
+//                    .build()
+//                    .parseClaimsJws(token)
+//                    .getPayload();
+        Claims claims = Jwts.parser()
+                .verifyWith(Keys.hmacShaKeyFor(secretKey.getBytes()))
+                .build()
+                .parseClaimsJws(token)
+                .getPayload();
             return claims;
 
 
@@ -55,8 +62,10 @@ public class JwtUtilities {
     }
 
     public String extractRole(String token){
+
         Claims claims = getClaimsFromToken(token);
-        return claims.get("role", String.class);
+        //System.out.println("CLaims at api=gateway " + claims);
+        return claims.get("roles", String.class);
     }
 
     public boolean isTokenExpired(String token){

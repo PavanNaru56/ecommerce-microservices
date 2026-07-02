@@ -30,6 +30,8 @@ public class JwtFilter implements GlobalFilter {
         // get the authorization header to validate the token
 
         String header = exchange.getRequest().getHeaders().getFirst("Authorization");
+   //     System.out.println("User Details in api-gateway : " + userDetails.getUsername());
+
 
         if(header == null || !header.startsWith("Bearer ")){
             exchange.getResponse().setStatusCode(HttpStatus.UNAUTHORIZED);
@@ -49,6 +51,15 @@ public class JwtFilter implements GlobalFilter {
             exchange.getResponse().setStatusCode(HttpStatus.UNAUTHORIZED);
             return exchange.getResponse().setComplete();
         }
+
+        String role = jwtUtilities.extractRole(token);
+        System.out.println("Role at gateway" + role);
+
+        if(path.equals("/api/users/list") && !"ROLE_ADMIN".equals(role) ){
+            exchange.getResponse().setStatusCode(HttpStatus.UNAUTHORIZED);
+            return exchange.getResponse().setComplete();
+        }
+
 
         return chain.filter(exchange);
 
