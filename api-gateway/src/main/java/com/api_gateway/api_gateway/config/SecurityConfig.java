@@ -17,6 +17,7 @@ public class SecurityConfig {
                 .csrf(csrf -> csrf.disable())
                 .authorizeExchange(exchange -> exchange
                         .pathMatchers("/api/users/register", "/api/users/login").permitAll()
+                        .pathMatchers("/api/products/**").permitAll()
                         .anyExchange().permitAll()
                 )
                         .build();

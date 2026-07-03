@@ -9,6 +9,10 @@ spring:
           uri: http://localhost:8081
           predicates:
             - Path=/api/users/**
+        - id: product-service
+          uri: http://localhost:8082
+          predicates:
+              - Path=/api/products/**
 logging:
   level:
     org.springframework.cloud.gateway: TRACE

@@ -55,7 +55,7 @@ public class JwtFilter implements GlobalFilter {
         String role = jwtUtilities.extractRole(token);
         System.out.println("Role at gateway" + role);
 
-        if(path.equals("/api/users/list") && !"ROLE_ADMIN".equals(role) ){
+        if((path.equals("/api/users/list") || path.equals("/api/products/add") || path.equals("/api/products/delete/**") || path.equals("/api/products/update/**")) && !"ROLE_ADMIN".equals(role) ){
             exchange.getResponse().setStatusCode(HttpStatus.UNAUTHORIZED);
             return exchange.getResponse().setComplete();
         }
