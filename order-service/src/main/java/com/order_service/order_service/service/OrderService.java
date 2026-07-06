@@ -1,24 +1,31 @@
 package com.order_service.order_service.service;
 
+import com.order_service.order_service.clients.ProductClient;
 import com.order_service.order_service.dtos.OrderRequest;
 import com.order_service.order_service.dtos.OrderResponse;
+import com.order_service.order_service.dtos.ProductResponse;
 import com.order_service.order_service.model.Order;
 import com.order_service.order_service.model.OrderStatus;
 import com.order_service.order_service.repository.OrderRepository;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
+
 public class OrderService {
 
     private OrderRepository orderRepository;
+    private ProductClient productClient;
 
-    OrderService(OrderRepository orderRepository) {
+    OrderService(OrderRepository orderRepository, ProductClient productClient) {
         this.orderRepository = orderRepository;
+        this.productClient = productClient;
     }
 
     public OrderResponse createOrder(OrderRequest orderRequest) {
@@ -32,16 +39,28 @@ public class OrderService {
                 .build();
         Order order1 = orderRepository.save(order);
 
+        ProductResponse product = productClient.getProductById(orderRequest.getProductId());
+
+        BigDecimal totalPrice = product.getPrice()
+                .multiply(
+                        BigDecimal.valueOf(orderRequest.getQuantity())
+
+                );
+
+
         OrderResponse orderResponse = new OrderResponse();
 
         orderResponse.setId(order1.getId());
         orderResponse.setProductId(order1.getProductId());
         orderResponse.setUsername(order1.getUsername());
         orderResponse.setQuantity(order1.getQuantity());
-        orderResponse.setTotalPrice(order1.getTotalPrice());
+        orderResponse.setTotalPrice(totalPrice);
         orderResponse.setOrderStatus(order1.getOrderStatus());
 
         return orderResponse;
+
+
+
 
 
 
