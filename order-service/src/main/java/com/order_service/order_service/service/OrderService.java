@@ -9,6 +9,7 @@ import com.order_service.order_service.model.OrderStatus;
 import com.order_service.order_service.repository.OrderRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.RequestHeader;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -28,12 +29,14 @@ public class OrderService {
         this.productClient = productClient;
     }
 
-    public OrderResponse createOrder(OrderRequest orderRequest) {
+    public OrderResponse createOrder(OrderRequest orderRequest, String username) {
+
+
 
         Order order = Order.builder()
                 .productId(orderRequest.getProductId())
                 .quantity(orderRequest.getQuantity())
-                .username("pavannaru")
+                .username(username)
                 .orderStatus(OrderStatus.CREATED)
                 .createdAt(LocalDateTime.now())
                 .build();
@@ -108,4 +111,7 @@ public class OrderService {
         return orderResponse;
 
     }
+
+
+
 }

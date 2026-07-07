@@ -7,6 +7,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Mono;
+import org.springframework.http.server.reactive.ServerHttpRequest;
 
 @Component
 public class JwtFilter implements GlobalFilter {
@@ -55,6 +56,9 @@ public class JwtFilter implements GlobalFilter {
         String role = jwtUtilities.extractRole(token);
         System.out.println("Role at gateway" + role);
 
+        String username = jwtUtilities.getUsernameFromToken(token);
+        System.out.println("Username at gateway " + username);
+
         if((path.equals("/api/users/list") || path.equals("/api/products/add") || path.equals("/api/products/delete/**") || path.equals("/api/products/update/**")) && !"ROLE_ADMIN".equals(role) ){
             exchange.getResponse().setStatusCode(HttpStatus.UNAUTHORIZED);
             return exchange.getResponse().setComplete();
@@ -67,8 +71,24 @@ public class JwtFilter implements GlobalFilter {
             }
         }
 
+        //mutate the header and pass the modified exchange
 
-        return chain.filter(exchange);
+        ServerHttpRequest request = exchange.getRequest().mutate()
+                .header("X-User-Username", username)
+                .header("X-User-Role", role)
+                .build();
+
+        ServerWebExchange modifiedExchange = exchange.mutate()
+                .request(request).build();
+
+
+
+
+
+
+
+
+        return chain.filter(modifiedExchange);
 
 
 

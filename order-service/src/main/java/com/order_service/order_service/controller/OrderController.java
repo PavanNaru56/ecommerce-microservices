@@ -19,9 +19,9 @@ public class OrderController {
     }
 
     @PostMapping("/create")
-    public ResponseEntity<OrderResponse> create(@RequestBody OrderRequest orderRequest){
+    public ResponseEntity<OrderResponse> create(@RequestBody OrderRequest orderRequest, @RequestHeader("X-User-Username") String username) {
 
-        return ResponseEntity.ok(orderService.createOrder(orderRequest));
+        return ResponseEntity.ok(orderService.createOrder(orderRequest, username));
     }
 
     @GetMapping("/{id}")
@@ -35,4 +35,10 @@ public class OrderController {
 
         return ResponseEntity.ok(orderService.getAllOrders());
     }
+
+//    @GetMapping("/test-user")
+//    public String getUsername(@RequestHeader("X-User-Username") String username, @RequestHeader("X-User-Role") String role){
+//
+//        return username + " " + role;
+//    }
 }

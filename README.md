@@ -32,3 +32,11 @@ Create a dependency in order service
 using the productClient fetch the details
 
 
+Steps for User Context Propagation
+-------------------------------------------
+Normally we are hardcoded the username in the order-service while creating the order object
+Now extract the username and role from the token. In WebFlux the request inside the exchange is immutable So we can't modify the headers
+So copy the request from the exchange using the mutate and build it 
+then add username and role in the request and pass the modified exchange
+
+
