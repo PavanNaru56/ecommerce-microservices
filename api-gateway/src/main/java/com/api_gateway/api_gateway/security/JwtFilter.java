@@ -60,6 +60,13 @@ public class JwtFilter implements GlobalFilter {
             return exchange.getResponse().setComplete();
         }
 
+        if(path.startsWith("/api/orders")){
+            if(!role.equals("ROLE_ADMIN") && !role.equals("ROLE_USER")){
+                exchange.getResponse().setStatusCode(HttpStatus.FORBIDDEN);
+                return exchange.getResponse().setComplete();
+            }
+        }
+
 
         return chain.filter(exchange);
 
