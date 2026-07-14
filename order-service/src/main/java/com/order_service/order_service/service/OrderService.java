@@ -4,9 +4,13 @@ import com.order_service.order_service.clients.ProductClient;
 import com.order_service.order_service.dtos.OrderRequest;
 import com.order_service.order_service.dtos.OrderResponse;
 import com.order_service.order_service.dtos.ProductResponse;
+import com.order_service.order_service.event.OrderCreatedEvent;
 import com.order_service.order_service.model.Order;
 import com.order_service.order_service.model.OrderStatus;
+import com.order_service.order_service.producer.OrderEventProducer;
 import com.order_service.order_service.repository.OrderRepository;
+import lombok.AllArgsConstructor;
+import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.RequestHeader;
@@ -18,16 +22,19 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
-
+@RequiredArgsConstructor
 public class OrderService {
 
-    private OrderRepository orderRepository;
-    private ProductClient productClient;
+    private final OrderRepository orderRepository;
+    private final ProductClient productClient;
+    private final OrderEventProducer orderEventProducer;
 
-    OrderService(OrderRepository orderRepository, ProductClient productClient) {
-        this.orderRepository = orderRepository;
-        this.productClient = productClient;
-    }
+//    OrderService(OrderRepository orderRepository, ProductClient productClient, OrderEventProducer orderEventProducer) {
+//        this.orderRepository = orderRepository;
+//        this.productClient = productClient;
+//        this.orderEventProducer = orderEventProducer;
+//
+//    }
 
     public OrderResponse createOrder(OrderRequest orderRequest, String username) {
 
@@ -51,6 +58,7 @@ public class OrderService {
                 );
 
 
+
         OrderResponse orderResponse = new OrderResponse();
 
         orderResponse.setId(order1.getId());
@@ -59,6 +67,18 @@ public class OrderService {
         orderResponse.setQuantity(order1.getQuantity());
         orderResponse.setTotalPrice(totalPrice);
         orderResponse.setOrderStatus(order1.getOrderStatus());
+
+        // create the event
+
+        OrderCreatedEvent event = OrderCreatedEvent.builder()
+                .orderId(order1.getId())
+                .productId(order1.getProductId())
+                .username(order1.getUsername())
+                .quantity(order1.getQuantity())
+                .totalPrice(totalPrice)
+                .build();
+
+        orderEventProducer.publishOrderCreatedEvent(event);
 
         return orderResponse;
 
