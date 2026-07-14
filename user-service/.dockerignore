@@ -1,6 +1,0 @@
-target/*.original
-.git
-.idea
-.mvn
-src
-README.md
