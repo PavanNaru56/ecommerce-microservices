@@ -5,10 +5,12 @@ import com.order_service.order_service.dtos.OrderRequest;
 import com.order_service.order_service.dtos.OrderResponse;
 import com.order_service.order_service.dtos.ProductResponse;
 import com.order_service.order_service.event.OrderCreatedEvent;
+import com.order_service.order_service.exception.ProductServiceUnavailableException;
 import com.order_service.order_service.model.Order;
 import com.order_service.order_service.model.OrderStatus;
 import com.order_service.order_service.producer.OrderEventProducer;
 import com.order_service.order_service.repository.OrderRepository;
+import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
@@ -36,6 +38,12 @@ public class OrderService {
 //
 //    }
 
+
+
+    @CircuitBreaker(
+            name = "productServiceCB",
+            fallbackMethod = "createOrderFallback"
+    )
     public OrderResponse createOrder(OrderRequest orderRequest, String username) {
 
 
@@ -129,6 +137,15 @@ public class OrderService {
         orderResponse.setTotalPrice(order.getTotalPrice());
         orderResponse.setOrderStatus(order.getOrderStatus());
         return orderResponse;
+
+    }
+
+    public OrderResponse createOrderFallback(OrderRequest orderRequest, String username, Exception e) {
+
+        System.out.println("Fallback executed: " + e.getMessage());
+
+        throw new ProductServiceUnavailableException("Product Service Unavailable. Please try again later");
+
 
     }
 
