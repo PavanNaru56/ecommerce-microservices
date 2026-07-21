@@ -11,6 +11,7 @@ import com.order_service.order_service.model.OrderStatus;
 import com.order_service.order_service.producer.OrderEventProducer;
 import com.order_service.order_service.repository.OrderRepository;
 import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
+import io.github.resilience4j.retry.annotation.Retry;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
@@ -44,6 +45,9 @@ public class OrderService {
             name = "productServiceCB",
             fallbackMethod = "createOrderFallback"
     )
+    @Retry(
+            name = "productServiceRetry"
+    )
     public OrderResponse createOrder(OrderRequest orderRequest, String username) {
 
 
@@ -56,6 +60,11 @@ public class OrderService {
                 .createdAt(LocalDateTime.now())
                 .build();
         Order order1 = orderRepository.save(order);
+
+
+
+        System.out.println("Connecting to the product service ");
+
 
         ProductResponse product = productClient.getProductById(orderRequest.getProductId());
 
@@ -96,6 +105,9 @@ public class OrderService {
 
 
     }
+
+
+
 
     public OrderResponse getOrderById(Long id) {
 

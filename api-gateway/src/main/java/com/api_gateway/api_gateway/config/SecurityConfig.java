@@ -13,6 +13,10 @@ public class SecurityConfig {
     @Bean
     public SecurityWebFilterChain securityWebFilterChain(ServerHttpSecurity http) {
 
+
+        // In Security-config we are permitting all the requests without blocking any because the token validation will be done at JwtFIlter
+
+
         return http
                 .csrf(csrf -> csrf.disable())
                 .authorizeExchange(exchange -> exchange

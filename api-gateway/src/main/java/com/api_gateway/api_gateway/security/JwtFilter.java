@@ -19,6 +19,13 @@ public class JwtFilter implements GlobalFilter {
         this.jwtUtilities = jwtUtilities;
     }
 
+    // Here we extract the token from the request and we will validate the token using the JwtUtilities
+    // While using the microservices we will not store the token in SecurityContextHolder
+    // For every request we will get the token from the exchange headers and validates the token and routes to the other services using the GatewayFilterChain
+    // chain.filter(exchange)
+
+
+
     @Override
     public  Mono<Void> filter(ServerWebExchange exchange, GatewayFilterChain chain){
 
@@ -72,6 +79,9 @@ public class JwtFilter implements GlobalFilter {
         }
 
         //mutate the header and pass the modified exchange
+        // Context Propagation
+        //get the request, add the username and role to the request and this modified exchange
+        //exchanges are immutable, so we get the request and modify that send the modified exchange
 
         ServerHttpRequest request = exchange.getRequest().mutate()
                 .header("X-User-Username", username)

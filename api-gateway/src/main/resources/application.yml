@@ -1,3 +1,5 @@
+# Routes the requests based upon the id, uri and predicates path
+
 spring:
   application:
     name: api-gateway
