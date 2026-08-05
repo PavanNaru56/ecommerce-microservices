@@ -3,6 +3,7 @@ package com.payment_service.payment_service.service;
 
 import com.payment_service.payment_service.dtos.PaymentRequest;
 import com.payment_service.payment_service.dtos.PaymentResponse;
+import com.payment_service.payment_service.event.OrderCreatedEvent;
 import com.payment_service.payment_service.model.Payment;
 import com.payment_service.payment_service.model.PaymentStatus;
 import com.payment_service.payment_service.repository.PaymentRepository;
@@ -48,6 +49,17 @@ public class PaymentService {
                 .orElseThrow(() -> new RuntimeException(("Payment not found with id " + id)));
 
         return mapToPaymentResponse(payment);
+    }
+
+    public void savePaymentAuto(OrderCreatedEvent orderCreatedEvent){
+
+        Payment payment = Payment.builder().
+                orderId(orderCreatedEvent.getOrderId())
+                .amount(orderCreatedEvent.getTotalPrice())
+                .status(PaymentStatus.PENDING)
+                .createdAt(LocalDateTime.now())
+                .build();
+        paymentRepository.save(payment);
     }
 
     private PaymentResponse mapToPaymentResponse(Payment payment) {

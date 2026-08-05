@@ -23,6 +23,10 @@ spring:
           uri : http://localhost:8084
           predicates:
               - Path=/api/notification/**
+        - id : payment-service
+          uri : http://localhost:8085
+          predicates:
+              - Path=/api/payment/**
 
 logging:
   level:
