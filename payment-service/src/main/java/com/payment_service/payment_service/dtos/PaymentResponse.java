@@ -14,6 +14,8 @@ import java.time.LocalDateTime;
 @Builder
 public class PaymentResponse {
 
+    public Long paymentId;
+
     public Long orderId;
 
     public BigDecimal amount;

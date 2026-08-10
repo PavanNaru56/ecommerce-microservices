@@ -4,9 +4,12 @@ package com.payment_service.payment_service.service;
 import com.payment_service.payment_service.dtos.PaymentRequest;
 import com.payment_service.payment_service.dtos.PaymentResponse;
 import com.payment_service.payment_service.event.OrderCreatedEvent;
+import com.payment_service.payment_service.exception.PaymentAlreadyProcessedException;
+import com.payment_service.payment_service.exception.PaymentNotFoundException;
 import com.payment_service.payment_service.model.Payment;
 import com.payment_service.payment_service.model.PaymentStatus;
 import com.payment_service.payment_service.repository.PaymentRepository;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -62,8 +65,29 @@ public class PaymentService {
         paymentRepository.save(payment);
     }
 
+    @Transactional
+    public PaymentResponse processPayment(Long paymentId){
+
+        Payment payment = paymentRepository.findById(paymentId)
+                .orElseThrow(() -> new PaymentNotFoundException("Payment  not found with id " + paymentId));
+        
+        if(payment.getStatus() == PaymentStatus.SUCCESS){
+
+            throw new PaymentAlreadyProcessedException("Payment already processed");
+        }
+
+        payment.setStatus(PaymentStatus.SUCCESS);
+        paymentRepository.save(payment);
+        return mapToPaymentResponse(payment);
+
+
+
+
+    }
+
     private PaymentResponse mapToPaymentResponse(Payment payment) {
         return PaymentResponse.builder()
+                .paymentId(payment.getId())
                 .orderId(payment.getOrderId())
                 .amount((payment.getAmount()))
                 .status(payment.getStatus().toString())
@@ -72,4 +96,5 @@ public class PaymentService {
 
 
     }
+
 }
