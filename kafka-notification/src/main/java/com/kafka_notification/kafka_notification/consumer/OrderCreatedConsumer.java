@@ -23,7 +23,6 @@ public class OrderCreatedConsumer {
     )
 
 
-
     public void consume(OrderCreatedEvent orderCreatedEvent) {
 
 

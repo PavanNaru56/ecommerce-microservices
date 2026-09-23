@@ -24,4 +24,7 @@ public class ProductRequest {
 
     @NotNull
     private  Integer quantity;
+
+    @NotNull
+    private BigDecimal discount;
 }

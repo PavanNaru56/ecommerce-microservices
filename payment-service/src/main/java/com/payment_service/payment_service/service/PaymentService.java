@@ -4,10 +4,12 @@ package com.payment_service.payment_service.service;
 import com.payment_service.payment_service.dtos.PaymentRequest;
 import com.payment_service.payment_service.dtos.PaymentResponse;
 import com.payment_service.payment_service.event.OrderCreatedEvent;
+import com.payment_service.payment_service.event.PaymentProcessedEvent;
 import com.payment_service.payment_service.exception.PaymentAlreadyProcessedException;
 import com.payment_service.payment_service.exception.PaymentNotFoundException;
 import com.payment_service.payment_service.model.Payment;
 import com.payment_service.payment_service.model.PaymentStatus;
+import com.payment_service.payment_service.producer.PaymentEventProducer;
 import com.payment_service.payment_service.repository.PaymentRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -21,6 +23,7 @@ import java.util.List;
 public class PaymentService {
 
     private final PaymentRepository paymentRepository;
+    private final PaymentEventProducer paymentEventProducer;
 
     public PaymentResponse createPayment(PaymentRequest paymentRequest) {
 
@@ -78,6 +81,23 @@ public class PaymentService {
 
         payment.setStatus(PaymentStatus.SUCCESS);
         paymentRepository.save(payment);
+
+        PaymentProcessedEvent paymentProcessedEvent = PaymentProcessedEvent.builder()
+                .paymentId(payment.getId())
+                .orderId(payment.getOrderId())
+                .amount(payment.getAmount())
+                .status(String.valueOf(payment.getStatus()))
+                .createdAt(payment.getCreatedAt())
+                .build();
+
+        paymentEventProducer.publish(paymentProcessedEvent);
+
+
+
+
+
+
+
         return mapToPaymentResponse(payment);
 
 

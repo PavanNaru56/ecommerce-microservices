@@ -56,5 +56,13 @@ public class ProductController {
         return ResponseEntity.ok().body(res);
     }
 
+    @GetMapping("/hotDeals")
+    public ResponseEntity<List<Product>> getHotDeals(){
+
+        List<Product> deals = productService.getDeals();
+
+        return ResponseEntity.ok().body(deals);
+    }
+
 
 }

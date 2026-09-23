@@ -5,6 +5,7 @@ import com.product_service.product_service.model.Product;
 import com.product_service.product_service.repository.ProductRepository;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 @Service
@@ -24,6 +25,7 @@ public class ProductService {
         product.setDescription(productRequest.getDescription());
         product.setPrice(productRequest.getPrice());
         product.setQuantity(productRequest.getQuantity());
+        product.setDiscount(productRequest.getDiscount());
 
         productRepository.save(product);
 
@@ -59,4 +61,13 @@ public class ProductService {
         productRepository.delete(product);
         return "Product has been deleted";
     };
+
+    public List<Product> getDeals(){
+
+        List <Product> products = productRepository.findAll();
+
+        List<Product> deals = products.stream().filter(product -> product.getDiscount().compareTo(BigDecimal.valueOf(20)) >= 0).toList();
+
+        return deals;
+    }
 }
